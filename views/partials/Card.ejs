@@ -1,0 +1,26 @@
+<div class="container d-flex justify-content-center" style="width: 95vw; background-color: rgb(155, 103, 36);">
+
+    <div class="container-cards mt-5 mb-5">
+        <div class="container-img d-flex justify-content-center">
+            <img class="img-card" id='Imgcard_<%= element.IdCard %>' src="<%= `data:${element.TipoImagemCard};base64,` + BlobToBase64Content(element.ImagemCard) %>" alt="naruto comendo um ramen" height="100%">
+        </div>
+        <div class="container-nome-clan">
+            <span class="ps-1 pe-1 text-light w-100" style="font-size: 0.6rem; font-weight: bold;">
+                <%= element.NomeCard %>
+            </span>
+            <img class="bg-white rounded-circle" src="<%= `data:${element.TipoImagemClan};base64,` + BlobToBase64Content(element.ImagemClan) %>"  style="width: 10%;object-fit: scale-down;" alt="">
+        </div>
+        <div class="container-nivel-aldeia">
+            <span class="ps-1 pe-1 text-light" style="font-size: 0.5rem;text-align: center;">
+                <strong>Nivel: </strong>
+                <strong style="color: rgb(255, 115, 0);"> <%= element.NomeNivel %></strong>
+            </span>
+            <img  class="bg-white rounded-circle" src="<%= `data:${element.TipoImagemAldeia};base64,` + BlobToBase64Content(element.ImagemAldeia) %>"  alt="" style="width: 10%; padding: 1px; object-fit: cover;" alt="">
+        </div>
+        <div class="descricao">
+            <p style="font-size: 0.7em; height: 100%; text-align: center;">
+                <%= element.DescricaoCard %>
+            </p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,189 @@
+
+
+<script> 
+    
+    function ShowModalEditCard(item){
+        const editModal = document.getElementById('EditModal');
+        var galleryModal = new bootstrap.Modal(editModal, {
+            keyboard: false
+        });
+        const titleModal = document.getElementById('EditModalLabel');
+        titleModal.innerHTML = item == null ? "Novo <%= rota %>" : "Editar <%= rota %>";
+        console.log(item);
+        if(item){
+            console.log("chama api");
+            fetch(`/api/<%= rota %>/${item}`)
+            .then(T => T.json())
+            .then(T =>{
+                console.log("opa")
+                Id.value = T[0].Id;
+                Nome.value = T[0].Nome;
+                Descricao.value = T[0].Descricao;
+                IdClan.value = T[0].IdClan;
+                IdNivel.value = T[0].IdNivel;
+                IdAldeia.value = T[0].IdAldeia;
+                
+
+                if(T[0].Imagem)
+                {
+                    let base64Content = BlobToBase64Content(T[0].Imagem.data);
+                    const base64 = `data:${T[0].TipoImagem};base64,` + base64Content;
+                    document.getElementById('ImgContainer').src =  base64;
+
+                    const mimeType = T[0].TipoImagem;
+                    const blob = b64toBlob(base64Content, mimeType);
+                    
+                    NomeImagem.value = T[0].NomeImagem ? T[0].NomeImagem: "Image." + mimeType.split('/')[1];
+                    imageInput.files = BlobToInputFileList(blob, NomeImagem.value, mimeType);
+                    NomeImagem = NomeImagem;
+                }else{
+                    ImgContainer.src = "";
+                    NomeImagem.value = "";
+                    
+                    let dataTransfer = new DataTransfer();
+                    imageInput.files = dataTransfer.files;
+                }
+            })
+        }
+        else{
+            Id.value = 0;
+            Nome.value = "";
+            Descricao.value = "";
+            ImgContainer.src = "/imgs/imagem-temp.png";
+            NomeImagem.value = "";
+            
+            let dataTransfer = new DataTransfer();
+            imageInput.files = dataTransfer.files;
+
+        }
+
+        galleryModal.show();
+    }
+
+    
+</script>
+<div class="modal fade rounded-5" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="<%= action %>" enctype="multipart/form-data">
+            <div class="modal-header  bg-dark">
+                <h5 class="modal-title text-light" id="EditModalLabel"></h5>
+                <button type="button" class="btn-close bg-white p-3 rounded-circle" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <div class=" d-flex justify-content-between">
+                        <div class="mb-0 col-3">
+                            <label for="Id" class="col-form-label">ID:</label>
+                            <input type="text" class="form-control" value="0" id="Id" name="Id" readonly>
+                        </div>
+                        <div class="w-25 container-img" style="background-color: rgb(81, 153, 221); max-height: 92px; width: fit-content;">
+                            <img id="ImgContainer" src="/imgs/imagem-temp.png" height="92px" width="100%" style="object-fit:contain;" alt="">
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label for="Nome" class="col-form-label">Nome:</label>
+                        <input type="text" class="form-control" id="Nome" name="Nome">
+                    </div>
+                    <div class="mb-0">
+                        <label for="Descricao" class="col-form-label">Descrição:</label>
+                        <textarea class="form-control" id="Descricao" name="Descricao"></textarea>
+                    </div>
+                    <div class="mb-0">
+                        <label for="NomeImagem" class="col-form-label">Nome do arquivo:</label>
+                        <input type="text" class="form-control" id="NomeImagem" name="NomeImagem"></input>
+                    </div>
+                    <div class="mb-0 d-flex flex-column ">
+                        <label for="Imagem" class="col-form-label">Imagem:</label>
+                        <input id="imageInput" name="Imagem" type="file" class="w-100" accept="image/jpeg, image/png, image/jpg">
+                    </div>
+
+                    <div class="mb-0">
+                        <label for="IdClan" class="col-form-label">Clã:</label>
+                        <select class="form-control" id="IdClan" name="IdClan">
+                            <% if(Card.rowClan && Card.rowClan.length > 0){ 
+                                Card.rowClan.forEach((element)=>{%>
+                                <option value='<%= element.Id %>'><%= element.Nome %></option>
+
+                                <%})}%>
+                        </select>
+                    </div>
+
+                    <div class="mb-0">
+                        <label for="IdNivel" class="col-form-label">Nível:</label>
+                        <select class="form-control" id="IdNivel" name="IdNivel">
+                            <% if(Card.rowNivel && Card.rowNivel.length > 0){ 
+                                Card.rowNivel.forEach((element)=>{%>
+                                <option value='<%= element.Id %>'><%= element.Nome %></option>
+
+                                <%})}%>
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <label for="IdAldeia" class="col-form-label">Aldeia:</label>
+                        <select class="form-control" id="IdAldeia" name="IdAldeia">
+                            <% if(Card.rowAldeia && Card.rowAldeia.length > 0){ 
+                                Card.rowAldeia.forEach((element)=>{%>
+                                <option value='<%= element.Id %>'><%= element.Nome %></option>
+
+                                <%})}%>
+                        </select>
+                    </div>
+
+                    <script>
+                        const imageInput = document.getElementById('imageInput');
+                        imageInput.addEventListener('change', (imageInput)=>RefreshImage(imageInput));
+                        
+                        
+                        function RefreshImage(element)
+                        {
+                            const file = element.target.files[0]; 
+                            const ImgContainer = document.getElementById("ImgContainer");
+                            console.log(element);
+
+                            if(ImgContainer && element != null)
+                            {
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    ImgContainer.src = e.target.result;
+                                    NomeImagem.value = imageInput.files[0].name;
+                                }
+                                console.log(typeof(file))
+                                    reader.readAsDataURL(file);
+                            }
+                        }
+                    </script>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+        </div>
+    </div>
+    <style>
+        input[type=file] {
+                width: 350px;
+                max-width: 100%;
+                color: #444;
+                padding: 5px;
+                background: #fff;
+                border-radius: 10px;
+                /* border: 1px solid #555; */
+                box-shadow: 0px 0px 5px black;
+            }
+            input[type=file]::file-selector-button {
+                margin-right: 20px;
+                border: none;
+                background: #084cdf;
+                padding: 10px 20px;
+                border-radius: 10px;
+                color: #fff;
+                cursor: pointer;
+                transition: background .2s ease-in-out;
+            }
+
+            input[type=file]::file-selector-button:hover {
+                background: #0d45a5;
+            }
+    </style>
+</div>

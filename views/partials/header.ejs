@@ -1,0 +1,30 @@
+
+<header class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        
+          <a class="navbar-brand bg-light rounded-2 text-dark ps-2 pe-2" href="#" style="background: url(/imgs/naruto-logo.png) no-repeat center;background-size: 100%; width: 5rem; height: 2rem;"></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link <%= rota == "Home"?"active":"" %>" aria-current="Home" href="/">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link <%= rota == "Card"?"active":"" %>" aria-current="Card" href="/Card">Cards</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link <%= rota == "Clan"?"active":"" %>" href="/Clan">Clãs</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link <%= rota == "Nivel"?"active":"" %>" href="/Nivel">Níveis</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link <%= rota == "Aldeia"?"active":"" %>" href="/Aldeia">Aldeias</a>
+              </li>
+            </ul>
+          </div>
+        
+      </nav>
+</header>

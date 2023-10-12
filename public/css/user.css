@@ -1,0 +1,85 @@
+* {
+    padding: 0 ;
+    margin: 0 ;
+    box-sizing: border-box ;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.container-cards {
+    width: 200px;
+    height: 300px;
+    background-color: rgb(15, 7, 7);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 2px;
+    border: 1px 1px 2px black;
+    box-shadow: 0px 0px 5px black;
+}
+
+.container-img {
+    /* width: 15%; */
+    height: 100%;
+    overflow: hidden;
+    /* transition: all .5s ease-in-out; */
+}
+.container-img > img{
+    background-color: rgb(83, 79, 79);
+    object-fit: cover;
+    width: 100%;
+    object-position: center;
+
+}
+
+.container-img {
+    box-shadow: 0px 0px 5px black;
+}
+
+.container-img>img:hover {
+    scale: 3;
+    transition: all .5s ease-in-out;
+    transform: translate(-10%, 10%);
+}
+
+.container-img>img:not(:hover) {
+    transition: all .5s ease-in-out;
+}
+
+.container-nome-clan {
+    /* background-color: green; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container-nivel-aldeia {
+    /* background-color: blueviolet; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.descricao {
+    height: 100%;
+    background-color: white;
+    border-radius: 2px;
+}
+
+.descricao>p {
+    overflow-y: auto;
+    height: inherit;
+    word-wrap: break-word;
+    margin: 0 !important;
+}
+
+
+tr :last-child{
+    width: 10%;
+    text-align-last: inherit;
+} 
+footer {
+    border-top: 1px solid white  ;
+    padding-top: 15px;
+    background-color: black;
+}

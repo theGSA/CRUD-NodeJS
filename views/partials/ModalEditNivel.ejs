@@ -1,0 +1,71 @@
+
+
+<script> 
+    
+    //console.log(jsonClan);
+    function ShowModal(item){
+        const editModal = document.getElementById('EditModal');
+        var galleryModal = new bootstrap.Modal(editModal, {
+            keyboard: false
+        });
+        const titleModal = document.getElementById('EditModalLabel');
+        titleModal.innerHTML = item == null ? "Novo Nivel" : "Editar Nivel";
+        console.log(item);
+        if(item){
+            console.log("chama api");
+            fetch(`/api/<%= rota %>/${item}`)
+            .then(T => T.json())
+            .then(T =>{
+                console.log("opa")
+                Id.value = T[0].Id;
+                Nome.value = T[0].Nome;
+                Descricao.value = T[0].Descricao;
+            })
+            .catch(e =>{
+                console.log(e);
+            })
+        }
+        else{
+            Id.value = 0;
+            Nome.value = "";
+            Descricao.value = "";
+            
+        }
+
+        galleryModal.show();
+    }
+
+    
+</script>
+<div class="modal fade rounded-5" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="<%= action %>">
+            <div class="modal-header  bg-dark">
+                <h5 class="modal-title text-light" id="EditModalLabel"></h5>
+                <button type="button" class="btn-close bg-white p-3 rounded-circle" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <div class=" d-flex justify-content-between">
+                        <div class="mb-3 col-3">
+                            <label for="Id" class="col-form-label">ID:</label>
+                            <input type="text" class="form-control" value="0" id="Id" name="Id" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Nome" class="col-form-label">Nome:</label>
+                        <input type="text" class="form-control" id="Nome" name="Nome">
+                    </div>
+                    <div class="mb-3">
+                        <label for="Descricao" class="col-form-label">Descrição:</label>
+                        <textarea class="form-control" id="Descricao" name="Descricao"></textarea>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>

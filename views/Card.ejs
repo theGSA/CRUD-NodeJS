@@ -1,0 +1,41 @@
+        <div class="d-flex justify-content-between">
+            <h3 class="text-primary">Cards</h3>
+            <a class="btn btn-primary" onclick="ShowModalEditCard()"><i class="bi-plus"></i></a>
+        </div>
+        <% if(Card.Card && Card.Card.length> 0){%>
+            <table class="table table-dark table-striped mt-2">
+                <thead>
+                    <th>Id</th>
+                    <th>Nome</th>
+                    <th>Descricao</th>
+                    <!-- <th>imagem</th> -->
+                    <th>Ações</th>
+                </thead>
+                <tbody>
+                    <% Card.Card.forEach(element=> {%>
+                        <tr>
+                            <td>
+                                <%= element.Id %>
+                            </td>
+                            <td id='item_name_<%= element.Id %>'>
+                                <%= element.Nome %>
+                            </td>
+                            <td>
+                                <%= element.Descricao %>
+                            </td>
+
+                            <td>
+                                <i class="bi-pen btn text-primary" onclick='ShowModalEditCard("<%= element.Id %>")'></i>
+                                <i onclick='ShowModalDeleteItem("<%= element.Id  %>")'
+                                    class="bi-trash text-danger btn"></i>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+            <% }else{%>
+                <p>Nenhum Card cadastrado!</p>
+            <% } %>
+
+<%- include('partials/ModalEditCard', {rota:"Card", action:"/InserirCard"}); %>
+<%- include('partials/ModalDeleteItem',{rota: "Card" , action:"/DeleteCard"}); %>

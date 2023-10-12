@@ -1,0 +1,107 @@
+
+        <div class="d-flex justify-content-between">
+            <h3 class="text-primary">Home</h3>
+            <div>
+                <button class="btn btn-warning" href="#" onclick="ImprimirItem()" >Gerar pdf</button>
+            </div>
+        </div>
+        <div class="d-flex">
+            <div id="carouselExampleIndicators" class="carousel slide">
+                <div class="carousel-indicators">
+                    <% rowCard.forEach((element, index) => { %>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="<%= index %>" class=<%= index == 0 ? 'active' : '' %> aria-current="true" aria-label="Slide <%= index %>"></button>
+                    <% }) %>
+                </div>
+                <div class="carousel-inner w-100">
+                    <% rowCard.forEach((element, index) => { %>
+                        <div class="carousel-item <%= index == 0 ? 'active' : '' %>">
+                            <%- include('partials/Card', {element: element}) %>
+                        </div>
+                    <% }) %>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <%- include('partials/PdfViewer')  %>
+        </div>
+        
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+        <script>
+            //import { jsPDF } from "jspdf";
+            
+            function ImprimirItem(){
+                const cativeCarousel = document.querySelector('.carousel-inner');
+
+                if(cativeCarousel){
+
+                    elementWidth = cativeCarousel.offsetWidth;
+                    elementHeight = cativeCarousel.offsetHeight;
+                    
+                    const doc  = new jspdf.jsPDF({
+                        orientation: 'letter',
+                        unit: 'pt',
+                        format: [elementWidth , elementHeight + 0.1]
+                    });
+
+                    //const doc = new jspdf.jsPDF('p', 'pt', 'letter');
+
+                    
+
+                    const option = {
+                        pagesplit: true
+                    }
+
+                    doc.html(cativeCarousel, {
+                        callback: function (){
+                            const blob = doc.output('blob');
+                            console.log(blob);
+                            const a = document.createElement('a');
+                            const reader = new FileReader();
+
+                            reader.onload = ()=>{
+                                const bytes = new Uint8Array(reader.result);
+                                console.log(bytes);
+                            }
+
+
+                            reader.readAsArrayBuffer(blob)
+
+                          //  a.href = URL.createObjectURL(blob);
+                            const PdfViewer = document.querySelector('#PdfViewer');
+
+
+                            if(PdfViewer)
+                            {
+                                let obj = document.createElement('object');
+
+                                obj.data = URL.createObjectURL(blob);
+                                obj.type = 'Application/pdf';
+                                obj.width = '100%';
+                                obj.height = '100%';
+
+                                PdfViewer.innerHTML = "";
+                                PdfViewer.appendChild(obj);
+                                PdfViewer.style.display = 'block';
+                            }
+
+                            //a.download = 'document.pdf';
+                           // a.click();
+                            //doc.save("novo-pdf.pdf"); 
+                        }
+                    })
+                }
+                else{
+                    window.alert("o item nao existe.");
+                }
+
+            }
+        </script>
+

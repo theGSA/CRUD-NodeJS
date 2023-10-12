@@ -1,0 +1,6 @@
+<% if(Mensagem) {%>
+    <div class="alert <%= Mensagem.tipo == "success"?"alert-success":"alert-warning" %> alert-dismissible fade show" role="alert">
+        <%- Mensagem.content %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<% } %>

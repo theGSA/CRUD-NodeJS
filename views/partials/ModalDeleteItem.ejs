@@ -1,0 +1,40 @@
+<script>
+            function ShowModalDeleteItem(itemId)
+            {
+                console.log(`vai deletar o item ${itemId}`);
+                const DeleteModal = document.getElementById('DeleteModal');
+                const modal = new bootstrap.Modal(DeleteModal,{
+                    keyboard: false,
+                });
+                
+                const itemName= document.getElementById(`item_name_${itemId}`);
+                const FormDelete = document.getElementById('FormDelete');
+                const DeleteID = document.getElementById('DeleteID');
+                document.getElementById('ModalTextDelete').innerHTML = `Deseja deletar <strong><%= rota %></strong> <span class="text-warning">${itemName.innerText}</span>?` 
+                
+                DeleteID.value = itemId;
+                
+                modal.show();
+            }
+        </script>
+        
+        <div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" id="FormDelete" action="<%= action %>">
+                        <input type="hidden" id="DeleteID" name="Id">
+                        <div class="modal-header bg-dark">
+                            <h5 class="modal-title text-light" Id="DeleteModalLabel">Deletar?</h5>
+                            <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h2 id="ModalTextDelete">deletar</h2>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            <button type="submit" id="ButtonDeleteClan" class="btn btn-primary">Ok</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>

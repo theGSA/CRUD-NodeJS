@@ -1,0 +1,39 @@
+<div class="d-flex justify-content-between ">
+    <h3 class="text-primary">Aldeias</h3>
+    <a class="btn btn-primary" onclick="ShowModalEdit()"><i class="bi-plus"></i></a>
+</div>
+<% if(Aldeia){%>
+    <table class="table table-dark table-striped mt-2">
+        <thead>
+
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Descricao</th>
+                <th>Ações</th>
+
+        </thead>
+        <tbody>
+            <% Aldeia.forEach(element=> {%>
+                <tr>
+                    <td>
+                        <%= element.Id %>
+                    </td>
+                    <td id="item_name_<%= element.Id %>">
+                        <%= element.Nome %>
+                    </td>
+                    <td>
+                        <%= element.Descricao %>
+                    </td>
+                    <td>
+                        <i class="bi-pen btn text-primary" onclick='ShowModalEdit("<%= element.Id %>")'></i>
+                        <i class="btn bi-trash text-danger" onclick='ShowModalDeleteItem("<%= element.Id %>")'></i>
+                    </td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+    <%} else{%>
+        <p>Nenhuma aldeira cadastrada!</p>
+        <%}%>
+            <%- include("partials/ModalEdit", {action:"/inserirAldeia"}) %>
+                <%- include("partials/ModalDeleteItem", {action: "/DeleteAldeia" }) %>
