@@ -2,60 +2,68 @@
 const Common = require('../global/common');
 const express = require('express');
 const {tipoMensagem, Mensagem} = require('../Model/Messagem');
+const Clan = require('../Model/ClanModel');
 
 const app = express();
 
 class ClanController{
 
     static routeName = "Clan";
-
-    index(req, res){
-        app.locals.Rota = ClanController.routeName;
+    
+    async index(req, res){
         
-        Common.GetFromTableById(ClanController.routeName, req.params.id, (err, row) =>
-        {
-            let mensagem = app.locals.mensagem;
-            app.locals.mensagem = null;
-            if (err) {
-                mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-            }
-            res.render(ClanController.routeName, { Mensagem: mensagem, [ClanController.routeName]: row, rota: ClanController.routeName, layout:'Layout'});
+        app.locals.Rota = ClanController.routeName;
+
+        let mensagem = app.locals.mensagem;
+        app.locals.mensagem = null;
+        
+        Clan.findAll()
+        .then((row)=>{
+            res.render(ClanController.routeName, { Mensagem: mensagem, [ClanController.routeName]: row, rota: ClanController.routeName});
+        })
+        .catch({
+
         });
     }
 
-    apiGet(req, res){
-        Common.GetRowsByApi(ClanController.routeName,req.params.id, (_res)=>{
-            res.send(_res);
-        })
+    async apiGet(req, res){
+        var obj = await Clan.findByPk(req.params?.id);
+        res.send(obj);
     }
 
-    insert(req, res){
-            app.locals.Rota = ClanController.routeName;
-            Common.InsertInRouteWithImage(ClanController.routeName, req, (err)=>{
-                if(err){
-                    app.locals.mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-                }
-                else{
-                    let acao = (req.body.Id == 0) ? "inserido": "alterado";
-                    
-                    app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Clan ${req.body.Nome} ${acao} com sucesso!`);
-                }
-                res.redirect(`/${ClanController.routeName}`);
-            });
-        }
+    async insert(req, res){
+        app.locals.Rota = ClanController.routeName;
+        console.log(req.body);
 
-    delete(req, res){
+        const clan = req.body;
+
+        clan.Imagem = (req.files && req.files.Imagem) ? req.files.Imagem.data : null;
+        clan.TipoImagem = (req.files && req.files.Imagem) ? req.files.Imagem.mimetype : null;
+        
+        if(clan?.Id == 0){
+            clan.Id = null;
+            await Clan.create(clan)
+        }
+        else{
+            await Clan.update(clan, {where: { Id:clan.Id } });
+        }
+        let acao = (req.body.Id == 0) ? "inserido": "alterado";
+        app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Clan <span class="text-info>" ${clan.Nome} </span> ${acao} com sucesso!`);
+        res.redirect(`/${ClanController.routeName}`);
+
+    }
+
+    async delete(req, res){
         const {Id} = req.body;
-        Common.DeleteItem(`${ClanController.routeName}`, Id, (err, item)=>{
-            if(err){
-                console.log(err);
-                app.locals.mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-            }
-            else{
-                app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Clan <span class="text-info">${item.Nome}</span> deletado!`);
-                res.redirect(`/${ClanController.routeName}`);
-            }
+        console.log(`deletando ${Id}`);
+
+        const obj = await Clan.findOne({
+            where: {Id: Id}
         })
+
+        obj.destroy();
+        app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Clan <span class="text-info">${obj.Nome}</span> deletado!`);
+        res.redirect(`/${ClanController.routeName}`);
     }
 }
 

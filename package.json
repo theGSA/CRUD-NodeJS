@@ -5,6 +5,7 @@
     "express-ejs-layouts": "^2.5.1",
     "express-fileupload": "^1.4.0",
     "express-session": "^1.17.3",
+    "sequelize": "^6.33.0",
     "sqlite3": "^5.1.6"
   }
 }

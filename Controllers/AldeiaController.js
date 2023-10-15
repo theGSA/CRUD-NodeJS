@@ -2,59 +2,60 @@
 const Common = require('../global/common');
 const express = require('express');
 const {tipoMensagem, Mensagem} = require('../Model/Messagem');
+const Aldeia = require('../Model/AldeiaModel');
 
 const app = express();
 class AldeiaController{
 
     static routeName = "Aldeia";
 
-    index(req, res){
-        app.locals.Rota = AldeiaController.routeName;
+    async index(req, res){
         
-        Common.GetFromTableById(AldeiaController.routeName, req.params.id, (err, row) =>
-        {
-            let mensagem = app.locals.mensagem;
-            app.locals.mensagem = null;
-            if (err) {
-                mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-            }
-            res.render(AldeiaController.routeName, { Mensagem: mensagem, [AldeiaController.routeName]: row, rota: AldeiaController.routeName, layout:'Layout'});
-        });
+        app.locals.Rota = AldeiaController.routeName;
+        let mensagem = app.locals.mensagem;
+        app.locals.mensagem = null;
+        var row = await Aldeia.findAll();
+        res.render(AldeiaController.routeName, { Mensagem: mensagem, [AldeiaController.routeName]: row, rota: AldeiaController.routeName, layout:'Layout'});
     }
 
-    apiGet(req, res){
-        Common.GetRowsByApi(AldeiaController.routeName,req.params.id, (_res)=>{
-            res.send(_res);
-        })
+    async apiGet(req, res){
+        const obj = await Aldeia.findByPk(req.params?.id);
+        res.send(obj);
     }
 
-    insert(req, res){
-            app.locals.Rota = AldeiaController.routeName;
-            Common.InsertInRouteWithImage(AldeiaController.routeName, req, (err)=>{
-                if(err){
-                    app.locals.mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-                }
-                else{
-                    let acao = (req.body.Id == 0) ? "inserido": "alterado";
-                    
-                    app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Aldeia ${req.body.Nome} ${acao} com sucesso!`);
-                }
-                res.redirect(`/${AldeiaController.routeName}`);
-            });
+    async insert(req, res){
+        app.locals.Rota = AldeiaController.routeName;
+        console.log(req.body);
+
+        const aldeia = req.body;
+
+        aldeia.Imagem = (req.files && req.files.Imagem) ? req.files.Imagem.data : null;
+        aldeia.imgType = (req.files && req.files.Imagem) ? req.files.Imagem.mimetype : null;
+        
+        if(aldeia?.Id == 0){
+            aldeia.Id = null;
+            await Aldeia.create(aldeia)
         }
+        else{
+            await Aldeia.update(aldeia, {where: { Id:aldeia.Id } });
+        }
+        let acao = (req.body.Id == 0) ? "inserido": "alterado";
+        app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Aldeia <span class="text-info">${aldeia.Nome} </span> ${acao} com sucesso!`);
+        res.redirect(`/${AldeiaController.routeName}`);
 
-    delete(req, res){
+    }
+
+    async delete(req, res){
         const {Id} = req.body;
-        Common.DeleteItem(`${AldeiaController.routeName}`, Id, (err, item)=>{
-            if(err){
-                console.log(err);
-                app.locals.mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-            }
-            else{
-                app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Nivel <span class="text-info">${item.Nome}</span> deletado!`);
-                res.redirect(`/${AldeiaController.routeName}`);
-            }
+        console.log(`deletando ${Id}`);
+
+        const obj = await Aldeia.findOne({
+            where: {Id: Id}
         })
+
+        obj.destroy();
+        app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Aldeia <span class="text-info">${obj.Nome}</span> deletado!`);
+        res.redirect(`/${AldeiaController.routeName}`);
     }
 }
 

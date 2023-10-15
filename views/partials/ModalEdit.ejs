@@ -2,7 +2,7 @@
 
 <script> 
     
-    function ShowModalEdit(item){
+    async function ShowModalEdit(item){
         const editModal = document.getElementById('EditModal');
         var galleryModal = new bootstrap.Modal(editModal, {
             keyboard: false
@@ -11,25 +11,25 @@
         titleModal.innerHTML = item == null ? "Novo <%= rota %>" : "Editar <%= rota %>";
         console.log(item);
         if(item){
-            console.log("chama api");
-            fetch(`/api/<%= rota %>/${item}`)
+             console.log("chama api");
+             await fetch(`/api/<%= rota %>/${item}`)
             .then(T => T.json())
             .then(T =>{
                 console.log("opa")
-                Id.value = T[0].Id;
-                Nome.value = T[0].Nome;
-                Descricao.value = T[0].Descricao;
+                Id.value = T.Id;
+                Nome.value = T.Nome;
+                Descricao.value = T.Descricao;
 
-                if(T[0].Imagem)
+                if(T.Imagem)
                 {
-                    let base64Content = BlobToBase64Content(T[0].Imagem.data);
-                    const base64 = `data:${T[0].TipoImagem};base64,` + base64Content;
+                    let base64Content = BlobToBase64Content(T.Imagem.data);
+                    const base64 = `data:${T.TipoImagem};base64,` + base64Content;
                     document.getElementById('ImgContainer').src =  base64;
 
-                    const mimeType = T[0].TipoImagem;
+                    const mimeType = T.TipoImagem;
                     const blob = b64toBlob(base64Content, mimeType);
                     
-                    NomeImagem.value = T[0].NomeImagem ? T[0].NomeImagem: "Image." + mimeType.split('/')[1];
+                    NomeImagem.value = T.NomeImagem ? T.NomeImagem: "Image." + mimeType.split('/')[1];
                     imageInput.files = BlobToInputFileList(blob, NomeImagem.value, mimeType);
                     NomeImagem = NomeImagem;
                 }else{
@@ -112,7 +112,7 @@
                                     NomeImagem.value = imageInput.files[0].name;
                                 }
                                 console.log(typeof(file))
-                                    reader.readAsDataURL(file);
+                                reader.readAsDataURL(file);
                             }
                         }
                     </script>

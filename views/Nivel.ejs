@@ -31,7 +31,7 @@
         </tbody>
     </table>
     <% } else{%>
-        <p>Nenhum nivel cadastrado!</p>
+        <p style="color: white;">Nenhum nivel cadastrado!</p>
         <% }%>
             <%- include('partials/ModalDeleteItem', {rota:"Nivel", action: "/DeleteNivel" }) -%>
-                <%- include('partials/ModalEditNivel', {rota:"Nivel", action: "/InserirNivel" }) -%>
+            <%- include('partials/ModalEditNivel', {rota:"Nivel", action: "/InserirNivel" }) -%>

@@ -17,9 +17,9 @@
             .then(T => T.json())
             .then(T =>{
                 console.log("opa")
-                Id.value = T[0].Id;
-                Nome.value = T[0].Nome;
-                Descricao.value = T[0].Descricao;
+                Id.value = T.Id;
+                Nome.value = T.Nome;
+                Descricao.value = T.Descricao;
             })
             .catch(e =>{
                 console.log(e);

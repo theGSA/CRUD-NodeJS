@@ -2,105 +2,63 @@
 const Common = require('../global/common');
 const express = require('express');
 const {tipoMensagem, Mensagem} = require('../Model/Messagem');
-const db = require('../database/db');
+const Card = require('../Model/CardModel');
+const Clan = require('../Model/ClanModel');
+const Nivel = require('../Model/NivelModel');
+const Aldeia = require('../Model/AldeiaModel');
 
 const app = express();
 class CardController{
 
     static routeName = "Card";
 
-    static GetAllRows(CallBackFunc)
-    {
-        Common.GetFromTableById('Clan', 0, (err, row)=>{
-            const rowClan = row;
-            Common.GetFromTableById('Nivel', 0, (err, row)=>{
-                const rowNivel = row;
-                Common.GetFromTableById('Aldeia', 0, (err, row)=>{
-                    const rowAldeia = row;
-                    CallBackFunc({rowClan, rowAldeia, rowNivel});
-                })
-            })
-        });
-    }
-
-    index(req, res){
+    async index(req, res){
         app.locals.Rota = CardController.routeName;
         
-        Common.GetFromTableById(CardController.routeName, req.params.id, (err, row) =>
-        {
-            const Card = row;
-            CardController.GetAllRows((_row)=>{
-                Common.ResponseToPage( "Card",err, res, {Card, rowClan:_row.rowClan, rowAldeia: _row.rowAldeia, rowNivel: _row.rowNivel});
-            })
-        });
+        let mensagem = app.locals.mensagem;
+        app.locals.mensagem = null;
+
+        let objCard = await Card.findAll();
+        let rowClan = await Clan.findAll();
+        let rowAldeia = await Aldeia.findAll();
+        let rowNivel = await Nivel.findAll();
+
+        res.render(CardController.routeName, { Mensagem: mensagem, [CardController.routeName]:  {Card: objCard, rowClan, rowAldeia, rowNivel}, rota: CardController.routeName});
     }
 
-    apiGet(req, res){
-        Common.GetRowsByApi(CardController.routeName,req.params.id, (_res)=>{
-            res.send(_res);
-        })
+    async apiGet(req, res){ 
+        const obj = await Card.findByPk(req.params.id);
+        res.send(obj);
     }
 
-    insert(req, res){
-        const {Id, Nome, Descricao, IdClan, IdNivel, IdAldeia, NomeImagem} = req.body;
+    async insert(req, res){
+        app.locals.Rota = CardController.routeName;
+        console.log(req.body);
 
-            const Imagem = (req.files && req.files.Imagem) ? req.files.Imagem.data : null;
-            const imgType = (req.files && req.files.Imagem) ? req.files.Imagem.mimetype : null;
-            const imgNomeImagem = NomeImagem;
+        const card = req.body;
+
+        card.Imagem = (req.files && req.files.Imagem) ? req.files.Imagem.data : null;
+        card.TipoImagem = (req.files && req.files.Imagem) ? req.files.Imagem.mimetype : null;
         
-            app.locals.Rota = "Card";
-            if(typeof Id == 'undefined' || Id == 0){
-        
-                db.get(`SELECT IFNULL(MAX(ID), 0) + 1 MaxID FROM ${CardController.routeName}`, (err, row)=>{
-                    if(err)
-                    {
-                        console.log(err.message);
-                        app.locals.mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-                        res.redirect(`/${CardController.routeName}`);
-                    }
-                    db.run(`INSERT INTO ${CardController.routeName} VALUES(?,?,?,?,?,?,?,?,?)`,[row.MaxID, Nome, Descricao, IdClan,IdNivel, IdAldeia, Imagem, imgType, imgNomeImagem],(err)=>{
-                        if(err)
-                        {
-                            console.log(err.message);
-                            res.send("erro ao inserir"); 
-                        }
-                        else{
-        
-                            //res.send("item inserido com sucesso!");
-                            app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, 'Card Inserido com sucesso!');
-                            res.redirect(`/${CardController.routeName}`);
-                        }
-                    });
-                });
-            }
-            else{
-                console.log(`atualizando ${Id}`);
-                db.run(`UPDATE ${CardController.routeName} SET ID=?, Nome=?, Descricao=?, IdClan=?, IdNivel=?, IdAldeia=?, Imagem=?, TipoImagem=?, NomeImagem=? WHERE ID=?`,[Id, Nome, Descricao, IdClan,IdNivel, IdAldeia, Imagem, imgType, imgNomeImagem, Id],(err)=>{
-                    if(err)
-                    {
-                        console.log(err.message);
-                        app.locals.mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-                    }
-                    else{
-                        app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, "Card alterado com sucesso");
-                    }
-                    res.redirect(`/${CardController.routeName}`);
-                });
-            }
+        if(card?.Id == 0){
+            card.Id = null;
+            await Card.create(card)
         }
+        else{
+            await Card.update(card, {where: { Id:card.Id } });
+        }
+        let acao = (req.body.Id == 0) ? "inserido": "alterado";
+        app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Card <span class="text-info" > ${card.Nome} </span> ${acao} com sucesso!`);
+        res.redirect(`/${CardController.routeName}`);
+    }
 
-    delete(req, res){
+    async delete(req, res){
         const {Id} = req.body;
-        Common.DeleteItem(`${CardController.routeName}`, Id, (err, item)=>{
-            if(err){
-                console.log(err);
-                app.locals.mensagem = new Mensagem(tipoMensagem.ERRO, err.message);
-            }
-            else{
-                app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Card <span class="text-info">${item.Nome}</span> deletado!`);
-                res.redirect(`/${CardController.routeName}`);
-            }
-        })
+
+        const obj = await Card.findByPk(Id);
+        obj.destroy();
+        app.locals.mensagem = new Mensagem(tipoMensagem.SUCCESS, `Card <span class="text-info">${obj.Nome}</span> deletado!`);
+        res.redirect(`/${CardController.routeName}`);
     }
 }
 
